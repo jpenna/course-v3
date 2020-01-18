@@ -5,6 +5,10 @@
 The `fastai` is a framework on top of `Pytorch 1.0`. 
 It has a lot of helper methods to make it easier to create AI models.
 
+All the docs can be cloned and ran locally from https://github.com/fastai/fastai_docs.
+
+> Another library that simplify deep learning is Keras.
+
 ## Running
 
 ### Access GCP
@@ -37,3 +41,11 @@ To create a model for images:
    1. Use a set for training and a set for validation
 4. Verify the results
 5. Repeat step 3 to fine tune the model
+
+## Jupyter
+
+### Fastai methods
+
+```
+doc(something): show help + link to docs
+```

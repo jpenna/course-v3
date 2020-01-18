@@ -15,26 +15,39 @@ bs = 64
 # print(URLs.PETS)
 # URLs.PETS = https://s3.amazonaws.com/fast-ai-imageclas/oxford-iiit-pet
 
+# Downloads the images from a URL and untar it. Retruns a `path` object
 path = untar_data(URLs.PETS)
 
-path.ls()
+path.ls() # List content in path
 
 path_anno = path/'annotations'
 path_img = path/'images'
 
-fnames = get_image_files(path_img)
-fnames[:5]
+fnames = get_image_files(path_img) # Get image files in path
+# fnames[:5]
 
 np.random.seed(2)
 pattern = r'/([^/]+)_\d+.jpg$'
 
-data = ImageDataBunch.from_name_re(path_img, fnames, pattern, ds_tfms=get_transforms(), size=224, bs=bs
-                                  ).normalize(imagenet_stats)
+# ImageDataBunch: all the data you need to create a model
+# How to get the labels? Check models.md#Labels for a few examples
+data = ImageDataBunch.from_name_re(
+    path_img,
+    fnames,
+    pattern,
+    ds_tfms=get_transforms(), # Transform images: crop, resize, padding
+    size=224,
+    bs=bs
+)
+# Same name length, sizes, pixel values...
+data.normalize(imagenet_stats)
 
 data.show_batch(rows=3, figsize=(7,6))
 
-print(data.classes)
-len(data.classes),data.c
+# Check number of classes/labels
+print(data.classes) # Print labels
+len(data.classes) # Print count
+print(data.c) # Print count
 
 ###########################
 ######## Training #########
