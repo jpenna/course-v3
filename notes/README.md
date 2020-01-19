@@ -15,9 +15,14 @@ All the docs can be cloned and ran locally from https://github.com/fastai/fastai
 
 GCP has a fastai docker image, which starts Jupyter automatically on port 8080.
 
+```sh
+# Start the instance
+gcloud compute instances start fastai --zone=us-west
+```
+
 Run the following command to connect to the server and bind local port 8080.
 
-```bash
+```sh
 gcloud compute ssh fastai --zone=us-west2-b -- -L 8080:localhost:8080
 ```
 

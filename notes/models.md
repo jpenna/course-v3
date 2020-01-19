@@ -189,3 +189,29 @@ Train loss
 Valid loss: 
 
 Error rate: % of wrong classification
+
+
+## What can go wrong?
+
+Most will run right with the defaults, but if there is a problem, it will be most likely related to the `Learning Rate` or `Number of Epochs`.
+
+### Learning Rate
+
+It can be too low or too high.
+
+Too low, besides taking a really long time, may be getting too many looks at each image, so may overfit.
+
+```py
+learn.fit_one_cycle(1, max_lr=0.5)
+learn.fit_one_cycle(5, max_lr=1e-5)
+learn.recorder.plot_losses()
+```
+
+### Epochs
+
+Too many or too few epochs.
+
+```py
+learn.fit_one_cycle(1)
+learn.fit_one_cycle(40)
+```
