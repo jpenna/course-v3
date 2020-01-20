@@ -1,12 +1,23 @@
 import os
 import json
+import glob
+import itertools
 
-def handleImages(handler):
-    if (handler.path == '/get_images'):
-        return handler.send_json(json.dumps({ 'my': 1 }))
+def handleImages(handler, path, params = []):
+    if (path == '/get_images'):
+        pathParam = params.get('path').pop()
+        if pathParam is None:
+            raise Exception('Missing path param')
 
-def handleResource(handler):
-    full_path = os.getcwd() + handler.path
+        types = ('*.png', '*.jpg')
+
+        files_grabbed = [glob.glob(f'{pathParam}/{ext}') for ext in ['*.png', '*.jpg']]
+        files = [f'/{p}' for p in itertools.chain.from_iterable(files_grabbed)];
+
+        return handler.send_json(json.dumps(files))
+
+def handleResource(handler, path):
+    full_path = os.getcwd() + path
     if not os.path.exists(full_path):
         handler.send_error(404, 'Not found')
     elif os.path.isfile(full_path):

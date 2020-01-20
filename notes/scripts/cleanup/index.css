@@ -1,0 +1,45 @@
+#container {
+  display: flex;
+  flex-wrap: wrap;
+  background: aquamarine;
+}
+
+.image-block {
+  width: 30%;
+  min-width: 360px;
+  max-width: 280px;
+  margin: 10px;
+}
+
+.image-block img {
+  max-width: 100%;
+}
+
+.actions-bar {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.actions-bar button + button {
+  margin-left: 10px;
+}
+
+.delete-button {
+  background-color: #ff3860;
+  color: white;
+  border: none;
+  width: 100px;
+  line-height: 30px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+}
+
+.move-button {
+  background-color: hsl(204, 86%, 53%);
+  color: white;
+  border: none;
+  width: 100px;
+  line-height: 30px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+}

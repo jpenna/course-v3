@@ -1,13 +1,17 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from handlers import handleImages, handleResource
 import os
+import re
+from urllib.parse import parse_qs
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        path = re.split('/?\?', self.path);
+        params = parse_qs(path[1]) if len(path) > 1 else None;
         try:
-            if (handleImages(self)):
+            if (handleImages(self, path[0], params)):
                 return
-            handleResource(self)
+            handleResource(self, path[0])
         except Exception as msg:
             self.send_error(500, str(msg))
 

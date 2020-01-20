@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="index.css" rel="stylesheet"></link>
   <title>Cleanup Images</title>
 </head>
 <body>
 
   <form id="form">
-    <input type="text" id="path">
+    <input type="text" id="path" value="nbs/dl1/images/notebook_tutorial">
     <button type="submit">Go!</button>
   </form>
 
-  <div id="main"></div>
+  <div id="container"></div>
 
-  <div id="img-block">
+  <div id="img-block" class="image-block" hidden>
     <img src="./" />
-    <button type="button" data-path="" name="delete">Delete</button>
-    <button type="button" data-path="" name="move">Move</button>
+    <div class="actions-bar">
+      <button type="button" name="delete" onclick="deleteImage" class="delete-button">Delete</button>
+      <button type="button" name="move" onclick="moveImage" class="move-button">Move</button>
+    </div>
   </div>
 
 </body>
