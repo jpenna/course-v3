@@ -47,14 +47,13 @@ for c in classes:
 5. View data [optional]
 
 ```py
-If you already cleaned your data, run this cell instead of the one before
 np.random.seed(42)
-data = ImageDataBunch.from_csv(path, folder=".", valid_pct=0.2, csv_labels='cleaned.csv',
+data = ImageDataBunch.from_folder(path, train=".", valid_pct=0.2,
         ds_tfms=get_transforms(), size=224, num_workers=4).normalize(imagenet_stats)
 
-# If you haven't cleaned the images, run the following
+# If you already cleaned the images (topic 8), run the following
 # np.random.seed(42)
-# data = ImageDataBunch.from_folder(path, train=".", valid_pct=0.2,
+# data = ImageDataBunch.from_csv(path, folder=".", valid_pct=0.2, csv_labels='cleaned.csv',
 #         ds_tfms=get_transforms(), size=224, num_workers=4).normalize(imagenet_stats)
 
 print(data.classes)
