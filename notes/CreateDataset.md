@@ -146,9 +146,9 @@ defaults.device = torch.device('cpu')
 ## In production
 
 ```py
-learn = load_learner(path)
+learn = load_learner(path) # Should have the pkl file in this path
 
-img = open_image(path/'black'/'00000021.jpg')
-pred_class,pred_idx,outputs = learn.predict(img)
-pred_class # Category black
+img = open_image(path/'category_1'/'img.jpg')
+pred_class, pred_idx, outputs = learn.predict(img)
+pred_class # Prints: Category category_1
 ```

@@ -1,6 +1,4 @@
 function addImages(paths) {
-  console.log(paths)
-
   const container = document.getElementById('container')
   container.innerHTML = '';
 
