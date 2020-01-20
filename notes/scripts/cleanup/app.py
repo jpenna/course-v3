@@ -1,19 +1,48 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from handlers import handleImages, handleResource
+import handlers
 import os
 import re
 from urllib.parse import parse_qs
+import functools
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        path = re.split('/?\?', self.path);
-        params = parse_qs(path[1]) if len(path) > 1 else None;
+        (path, query) = self.getPathAndQuery()
         try:
-            if (handleImages(self, path[0], params)):
+            if path == '/notes/scripts/cleanup/get_images':
+                handlers.handleGetImages(self, path, query)
                 return
-            handleResource(self, path[0])
+            handlers.handleResource(self, path)
         except Exception as msg:
             self.send_error(500, str(msg))
+
+    def do_POST(self):
+        (path, query) = self.getPathAndQuery()
+        contentLength = int(self.headers.get('Content-Length'))
+        # Replace read to receive content length when called by json.load
+        self.rfile.read = functools.partial(self.rfile.read, contentLength)
+        try:
+            if path == '/notes/scripts/cleanup/images':
+                handlers.moveImage(self, self.rfile)
+            else:
+                self.send_error(404, 'Route not found')
+        except Exception as msg:
+            self.send_error(500, str(msg))
+
+    def do_DELETE(self):
+        (path, query) = self.getPathAndQuery()
+        try:
+            if path == '/notes/scripts/cleanup/images':
+                handlers.deleteImage(self, query)
+            else:
+                self.send_error(404, 'Route not found')
+        except Exception as msg:
+            self.send_error(500, str(msg))
+
+    def getPathAndQuery(self):
+        path = re.split(r'/?\?', self.path);
+        query = parse_qs(path[1]) if len(path) > 1 else None;
+        return (path[0], query)
 
     def handle_file(self, full_path):
         try:

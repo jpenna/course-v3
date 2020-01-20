@@ -16,12 +16,33 @@ function addImages(paths) {
   });
 }
 
-function deleteImage(path) {
-  console.log('delete', path);
+function deleteImage(path, button) {
+  fetch(`images?path=${path}`, {
+    method: 'DELETE'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) return;
+    button.parentElement.parentElement.remove();
+  })
+  .catch(e => console.error(e))
 }
 
-function moveImage(path) {
-  console.log('move', path);
+function moveImage(path, button) {
+  const newCategory = prompt('Which folder should it be moved to?', 'download_images');
+  fetch(`images`, {
+    method: 'POST',
+    body: JSON.stringify({
+      newCategory,
+      path,
+    }),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) return;
+    button.parentElement.parentElement.remove();
+  })
+  .catch(e => console.error(e))
 }
 
 window.onload = () => {
@@ -31,8 +52,8 @@ window.onload = () => {
 
     if (!path) return;
 
-    if (action === 'delete') deleteImage(path);
-    else if (action === 'move') moveImage(path);
+    if (action === 'delete') deleteImage(path, e.target);
+    else if (action === 'move') moveImage(path, e.target);
   });
 
   document.getElementById('form').addEventListener('submit', (e) => {
@@ -41,7 +62,7 @@ window.onload = () => {
     const path = document.getElementById('path').value;
     if (!path) return;
 
-    fetch(`/get_images?path=${path}`)
+    fetch(`get_images?path=${path}`)
       .then(response => response.json())
       .then(paths => addImages(paths))
       .catch((e) => console.error(e));

@@ -4,6 +4,15 @@
   background: aquamarine;
 }
 
+input#path {
+  line-height: 30px;
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+  width: 50%;
+  min-width: 200px;
+
+}
+
 .image-block {
   width: 30%;
   min-width: 360px;
