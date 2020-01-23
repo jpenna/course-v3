@@ -2,6 +2,8 @@
 
 Start importing the lib.
 
+> Neural Networks are good handling random noise. The problem is biased noise.
+
 ```py
 from fastai.vision import *
 ```
@@ -47,7 +49,10 @@ for c in classes:
 5. View data [optional]
 
 ```py
-np.random.seed(42)
+# Will seed the random number used to create a random validation set below, 
+# and because it is seeded, it will generate the same random numbers between runs,
+# therefore the same validation set
+np.random.seed(42) 
 data = ImageDataBunch.from_folder(path, train=".", valid_pct=0.2,
         ds_tfms=get_transforms(), size=224, num_workers=4).normalize(imagenet_stats)
 

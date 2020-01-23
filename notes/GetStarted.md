@@ -34,6 +34,17 @@ When done, stop the instance.
 gcloud compute instances stop fastai
 ```
 
+#### Update
+
+```sh
+# Update repo
+cd tutorials/fastai
+git pull
+
+# Update fastai lib
+sudo /opt/anaconda3/bin/conda install -c fastai fastai
+```
+
 ### Run local
 
 Run the following command from `course-v3` folder (or any parent folder).

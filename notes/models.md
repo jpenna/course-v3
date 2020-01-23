@@ -66,6 +66,10 @@ data.show_batch(rows=3, figsize=(7,6))
 
 ### Training
 
+The model is just a set of coefficients that works for the data set.
+
+> `resnet34` is just a function. It does not store anything, it is just a function.
+
 ```py
 learn = cnn_learner(data, models.resnet34, metrics=error_rate)
 learn.fit_one_cycle(4) # Will go through the data set 4x (take care with overfitting)
@@ -202,8 +206,16 @@ It can be too low or too high.
 Too low, besides taking a really long time, may be getting too many looks at each image, so may overfit.
 
 ```py
-learn.fit_one_cycle(1, max_lr=0.5)
+# Default max_lr 3e-3
+learn.fit_one_cycle(1, max_lr=0.5) 
+# 1. Validation loss goes too high (it is usually below 1)
+
 learn.fit_one_cycle(5, max_lr=1e-5)
+# 1. Error rate decreases too slowly
+# 2. Training loss > Validation loss: should always be the opposite
+#    Learning rate OR Number of epochs is too low
+
+# Plot error rate and validation loss
 learn.recorder.plot_losses()
 ```
 
@@ -211,7 +223,16 @@ learn.recorder.plot_losses()
 
 Too many or too few epochs.
 
+> Too few epochs and too low learning rate look similar
+
 ```py
 learn.fit_one_cycle(1)
+# 1. Training loss > Validation loss: should always be the opposite
+#    Learning rate OR Number of epochs is too low
+
 learn.fit_one_cycle(40)
+# Overfitting (error rate improves for a while and starts getting worse)
 ```
+
+> Training loss < Validation loss IS NOT a sign of overfitting (like some say).
+> Actually, the model should be like this.
