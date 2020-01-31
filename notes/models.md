@@ -188,7 +188,7 @@ Each layer adds a little more detail to identify categories of images.
 
 ### Metrics
 
-Train loss
+Train loss: Average distance between the real values (event) and the predicted line (plot)
 
 Valid loss: 
 

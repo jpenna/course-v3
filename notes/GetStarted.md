@@ -71,3 +71,11 @@ To create a model for images:
 ```
 doc(something): show help + link to docs
 ```
+
+### Install packages
+
+```py
+# Install a pip package in the current Jupyter kernel
+import sys
+!{sys.executable} -m pip install numpy
+```
