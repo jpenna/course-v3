@@ -15,7 +15,7 @@ fnames = get_image_files(path_img)
 ### Labels
 
 The main difference between the handling of image classification datasets is the way labels are stored.
-FastAI has several way to retrieve these labels.
+FastAI has several ways to retrieve these labels.
 
 ```py
 #### From CSV
@@ -123,7 +123,7 @@ learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-4));
 
 > *Choosing learning rate rule of thumb*  
 > When unfrozen, pass a `max_lr` value with `slice`. 
-> Choose the first param as a value 10x smaller than a well before things started getting worse (beginning of the chart), 
+> Choose the first param as a value 10x smaller than well before things started getting worse (beginning of the chart), 
 > and the second param about 10 times smaller than the first stage.
 
 ## Data Bunches

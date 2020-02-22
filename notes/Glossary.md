@@ -6,7 +6,7 @@ In AI, tensor is a structured array. If it is 4x3, all the rows and columns have
 
 ## Learning Rate
 
-The value we multiply the gradient to decide how much to update the weight.
+The value we multiply the gradient ("slope") to decide how much to update the weight.
 
 ## Epoch
 

@@ -40,18 +40,18 @@ The model is just a set of coefficients that works for the data set.
 
 > `resnet34` is just a function. It does not store anything, it is just a function.
 
-### learning rate
+### Learning rate
 
 The learning rate is how much the model jumps from one point to the other trying to find the "optimal" point.
 
 For example, if you have a quadratic function and wants to find the minimal point, you could start somewhere, calculate the derivative and move a little to where the tangent line points to. The learning rate is how much you jump. If the learning rate is too high, the jump will go too far and the model will possibly never fit. If it is too low, it will jump too little and it will take longer to fit, if it fits at all.
+
+#### Stochastic Gradient Descent (SGD)
+
+Optimization method commonly used in neural networks.
 
 ![Learning rate plot](./img/learning_rate_plot.png)
 
 ### Underfitting / Overfitting
 
 ![Uderfitting and overfitting](./img/under_overfitting.png)
-
-## Stochastic Gradient Descent (SGD)
-
-Optimization method commonly used in neural networks.

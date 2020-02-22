@@ -10,7 +10,7 @@ torch.ones(n, k) # -> [[1.,1.], [1.,1.], ...]
 
 [torch.ones()](https://pytorch.org/docs/stable/torch.html#torch.ones)
 
-1. Set the first `x` to a random value (`y = a x0 + b x2`, `x2` will be `1`).
+2. Set the first `x` to a random value (`y = a x0 + b x2`, `x2` will be `1`).
 
 ```py
 x[:,0].uniform_(-1.,1)
@@ -76,7 +76,7 @@ a = nn.Parameter(a)
 def update():
     y_hat = x@a
     loss = mse(y, y_hat) # we are calculating over the whole set, in practice we use minibatches
-#     if t % 10 == 0: print(loss)
+    # if t % 10 == 0: print(loss)
     loss.backward() 
     with torch.no_grad():
         a.sub_(lr * a.grad)
@@ -93,4 +93,10 @@ plt.scatter(x[:,0],y)
 plt.scatter(x[:,0],x@a)
 ```
 
+**Concepts**
+
 [Minibatch](./Glossary.md#Minibatch)
+
+**Methods**
+
+[torch.Tensor.backward()](https://pytorch.org/docs/stable/autograd.html#torch.Tensor.backward)
