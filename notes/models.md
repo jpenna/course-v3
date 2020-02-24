@@ -130,9 +130,7 @@ learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-4));
 
 ### Sizes
 
-The GPU has to do a bunch of things in a lot of images.
-If the images are different sizes or shapes , it can't do this. 
-That's why we set a `size` param in `ImageDataBunch`.
+The GPU has to do a bunch of things in a lot of images. If the images are different sizes or shapes , it can't do this. That's why we set a `size` param in `ImageDataBunch`.
 
 `224` is a common size. 
 
@@ -145,6 +143,15 @@ That's why we set a `size` param in `ImageDataBunch`.
 -  Test data [optional]
 
 > Validation set prevents overfitting
+
+[Dataset](https://pytorch.org/docs/stable/data.html?highlight=dataset#torch.utils.data.Dataset) (`PyTorch`)  
+Abstract class to represent a dataset. All datasets that represent a map from keys to data samples should subclass it.
+
+[DataLoader](https://pytorch.org/docs/stable/data.html?highlight=dataset#torch.utils.data.DataLoader) (`PyTorch`)  
+Module to create mini-batches from the dataset. "Combines a dataset and a sampler, and provides an iterable over the given dataset."
+
+[DataBunch](https://docs.fast.ai/basic_data.html#DataBunch) (`FastAI`)  
+Class that binds together a training `DataLoader` and and a validation `DataLoader`. Also applies the transform function to the samples as batches are drawn.
 
 ## Learner
 
@@ -179,10 +186,7 @@ Use the method `fit_one_cycle` to train the model.
 
 ### Layers
 
-Each layer has a semantic complexity. 
-The first layer may be horizontal and vertical lines, the second shapes, the third body shapes and so on...
-For this reason, it may not be worth training the whole model from scratch, but just using the 
-dataset we have to train new layers to recognize what we are looking for in our use case.
+Each layer has a semantic complexity. The first layer may be horizontal and vertical lines, the second shapes, the third body shapes and so on... For this reason, it may not be worth training the whole model from scratch, but just using the dataset we have to train new layers to recognize what we are looking for in our use case.
 
 Each layer adds a little more detail to identify categories of images.
 
@@ -236,3 +240,91 @@ learn.fit_one_cycle(40)
 
 > Training loss < Validation loss IS NOT a sign of overfitting (like some say).
 > Actually, the model should be like this.
+
+## Multi-label models (Case: Stellite images)
+
+If each image can have more than 1 label, we have to do a few things differently.
+
+### DataBunch (Data block API)
+
+We don't use an `ImageDataBunch`, we use an `ImageList`, which uses the correct loss function to supports multiple classes.
+
+> [Data Block API](https://docs.fast.ai/data_block.html) (`FastAI`)  
+> The data block API lets you customize the creation of a `DataBunch` by isolating the underlying parts of that process in separate blocks. It basically lets you parametrize everything calling methods of the `DataBunch` class.
+
+```py
+# Will flip vertically and won't warp, because there is no perspective change in satellite images
+tfms = get_transforms(flip_vert=True, max_lighting=0.1, max_zoom=1.05, max_warp=0.)
+np.random.seed(42)
+src = (ImageList
+        .from_csv(path, 'train_v2.csv', folder='train-jpg', suffix='.jpg')
+        .split_by_rand_pct(0.2)
+        .label_from_df(label_delim=' ')) # labels are separated with spaces in the CSV
+data = (src
+        .transform(tfms, size=128)
+        .databunch() # Will create the DataBunch and DataLoaders in one go  
+        .normalize(imagenet_stats))
+
+# This will show the images separated by ;
+data.show_batch(rows=3, figsize=(12,9))
+```
+
+### Learner
+
+We use the same learner as before, but now with a different `metric` param to compare the correctness of the prediction. We now use `accuracy_threshold`, instead of the `accuracy` used previously.
+
+> Metrics do NOT change how the model is trained, it only serves to output values in the training result.
+
+`accuracy`: Will use the highest value from the possible predictions (the highest probability).
+
+`accuracy_threshold`: Will use any class which is higher than a threshold (used for multi-label samples).
+
+> [partial](https://docs.python.org/2/library/functools.html#functools.partial) is a Python utility to create partial functions. 
+
+```py 
+arch = models.resnet50
+acc_02 = partial(accuracy_thresh, thresh=0.2)
+f_score = partial(fbeta, thresh=0.2) # fbeta is the metric used in this competition in Kaggle
+learn = cnn_learner(data, arch, metrics=[acc_02, f_score]) 
+
+# Use `lr_finder` to pick a good learning rate
+learn.lr_find()
+```
+
+![Plot 1](./img/Models/lr_1.png)
+
+> *fbeta:* one of the ways to combine false positives and false negatives in one value.
+
+```py
+# Plot
+learn.recorder.plot()
+```
+
+![Loss 1](./img/Models/loss_1.png)
+
+Then fit the head of the network.
+
+```py
+lr = 0.01
+learn.fit_one_cycle(5, slice(lr))
+learn.save('stage-1-rn50')
+```
+
+And fine-tune...
+
+```py
+
+learn.unfreeze()
+learn.lr_find()
+learn.recorder.plot()
+```
+
+![Plot 2](./img/Models/lr_2.png)
+
+```py
+# From the chart select the next learning rate...
+learn.fit_one_cycle(5, slice(1e-5, lr/5))
+learn.save('stage-2-rn50')
+```
+
+![Loss 2](./img/Models/loss_2.png)
