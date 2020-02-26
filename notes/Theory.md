@@ -46,12 +46,28 @@ The learning rate is how much the model jumps from one point to the other trying
 
 For example, if you have a quadratic function and wants to find the minimal point, you could start somewhere, calculate the derivative and move a little to where the tangent line points to. The learning rate is how much you jump. If the learning rate is too high, the jump will go too far and the model will possibly never fit. If it is too low, it will jump too little and it will take longer to fit, if it fits at all.
 
+Showing how the learning rate changes the loss: [Video](https://youtu.be/MpZxV6DVsmM?t=4736)
+
 #### Stochastic Gradient Descent (SGD)
 
 Optimization method commonly used in neural networks.
 
-![Learning rate plot](./img/learning_rate_plot.png)
+![Learning rate plot](./img/shared/learning_rate_plot.png)
 
 ### Underfitting / Overfitting
 
-![Uderfitting and overfitting](./img/under_overfitting.png)
+![Uderfitting and overfitting](./img/Theory/under_overfitting.png)
+
+## Fit one cycle
+
+It start with the learning rate low, then increases it, then lower it again. We want the LR to decrease in the end to get closer to the optimized loss function.
+
+![Fit one cycle](./img/Theory/fit_one_cycle.png)
+
+![Decrease Learning Rate](./img/Theory/lr_decrease.png)
+
+Showing how the learning rate changes the loss: [Video](https://youtu.be/MpZxV6DVsmM?t=4736)
+
+![Good LR](./img/Theory/good_lr.png)
+![Low LR](./img/Theory/low_lr.png)
+![High LR](./img/Theory/high_lr.png)

@@ -121,10 +121,23 @@ learn.unfreeze()
 learn.fit_one_cycle(2, max_lr=slice(1e-6, 1e-4));
 ```
 
-> *Choosing learning rate rule of thumb*  
-> When unfrozen, pass a `max_lr` value with `slice`. 
-> Choose the first param as a value 10x smaller than well before things started getting worse (beginning of the chart), 
-> and the second param about 10 times smaller than the first stage.
+#### Choosing learning rate rule of thumb
+
+When unfrozen, pass a `max_lr` value with `slice`. 
+
+We want to get a value where the loss decreases fast.
+
+![Fine tune selection area](img/Models/fine_tune.png)
+
+In other scenarios, choose the first param as a value 10x smaller than well before things started getting worse (beginning of the chart), and the second param about 10 times smaller than the first stage.
+
+![Fine tune selection area 2](img/Models/fine_tune2.png)
+
+```py
+# `lr` is the previously used learning rate. 
+# Rule of thumb: divide by 5 to fine tune.
+learn.fit_one_cycle(5, slice(1e-5, lr/5))
+```
 
 ## Data Bunches
 
@@ -170,7 +183,7 @@ These metrics will be ran against the validation set.
 > Resnet is almost always good enough.  
 > Better to start with the small one, resnet34, and grow if needed.
 
->There are specialized architectures if one needs to run mobile.
+> There are specialized architectures if one needs to run mobile.
 
 When it is first run, it downloads the `resnet34` pre-trained weights. 
 So we already start with a model that knows how to categorize a thousand of images.
@@ -198,50 +211,15 @@ Valid loss:
 
 Error rate: % of wrong classification
 
+## Segmentation
 
-## What can go wrong?
+CAMVID notebook: [lesson3-camvid](../nbs/dl1/lesson3-camvid.ipynb)
 
-Most will run right with the defaults, but if there is a problem, it will be most likely related to the `Learning Rate` or `Number of Epochs`.
-
-### Learning Rate
-
-It can be too low or too high.
-
-Too low, besides taking a really long time, may be getting too many looks at each image, so may overfit.
-
-```py
-# Default max_lr 3e-3
-learn.fit_one_cycle(1, max_lr=0.5) 
-# 1. Validation loss goes too high (it is usually below 1)
-
-learn.fit_one_cycle(5, max_lr=1e-5)
-# 1. Error rate decreases too slowly
-# 2. Training loss > Validation loss: should always be the opposite
-#    Learning rate OR Number of epochs is too low
-
-# Plot error rate and validation loss
-learn.recorder.plot_losses()
-```
-
-### Epochs
-
-Too many or too few epochs.
-
-> Too few epochs and too low learning rate look similar
-
-```py
-learn.fit_one_cycle(1)
-# 1. Training loss > Validation loss: should always be the opposite
-#    Learning rate OR Number of epochs is too low
-
-learn.fit_one_cycle(40)
-# Overfitting (error rate improves for a while and starts getting worse)
-```
-
-> Training loss < Validation loss IS NOT a sign of overfitting (like some say).
-> Actually, the model should be like this.
+For segmentation we don't use a Neural Network, we use a U-Net (Convolutional Neural Network crated for biomedical image segmentation, but turned out to be useful for other areas as well).
 
 ## Multi-label models (Case: Stellite images)
+
+Planet satellite images from Kaggle: [lesson3-planet](../nbs/dl1/lesson3-planet.ipynb)
 
 If each image can have more than 1 label, we have to do a few things differently.
 
@@ -328,3 +306,86 @@ learn.save('stage-2-rn50')
 ```
 
 ![Loss 2](./img/Models/loss_2.png)
+
+### Adding another layer to the trained model
+
+Considering the same case above from the satellite images, we have resized our images to 128x128px, but the original images are 256x256px. If we use these images next, we can use the model we already have and add another layer with "different images" (for the model it will be considered a completely new set).
+
+```py
+data = (src.transform(tfms, size=256)
+        .databunch().normalize(imagenet_stats))
+
+learn.data = data # Replace the dataset
+data.train_ds[0][0].shape # Show the size of the images
+# torch.Size([3, 256, 256])
+
+learn.freeze() # To train only the last layer
+
+learn.lr_find()
+learn.recorder.plot()
+```
+
+![With 256 images layer](./img/Models/add256.png)
+
+```py
+lr=1e-2/2
+learn.fit_one_cycle(5, slice(lr))
+```
+
+![With 256 images layer](./img/Models/add256_acc.png)
+
+## Error handling
+
+Most will run right with the defaults, but if there is a problem, it will be most likely related to the `Learning Rate` or `Number of Epochs`.
+
+### Learning Rate
+
+It can be too low or too high.
+
+Too low, besides taking a really long time, may be getting too many looks at each image, so may overfit.
+
+```py
+# Default max_lr 3e-3
+learn.fit_one_cycle(1, max_lr=0.5) 
+# 1. Validation loss goes too high (it is usually below 1)
+
+learn.fit_one_cycle(5, max_lr=1e-5)
+# 1. Error rate decreases too slowly
+# 2. Training loss > Validation loss: should always be the opposite
+#    Learning rate OR Number of epochs is too low
+
+# Plot error rate and validation loss
+learn.recorder.plot_losses()
+```
+
+### Epochs
+
+Too many or too few epochs.
+
+> Too few epochs and too low learning rate look similar
+
+```py
+learn.fit_one_cycle(1)
+# 1. Training loss > Validation loss: should always be the opposite
+#    Learning rate OR Number of epochs is too low
+
+learn.fit_one_cycle(40)
+# Overfitting (error rate improves for a while and starts getting worse)
+```
+
+> Training loss < Validation loss IS NOT a sign of overfitting (like some say).
+> Actually, the model should be like this.
+
+### What to do with wrong predictions?
+
+We can fine-tune the model by running it again with the same dataset or get only the wrong predicted data and fine-tune it. We may want to increase the learning rate or run more epochs over the wrong data too.
+
+### Running out of memory?
+
+#### 16 bit precision floats
+
+**Mixed precision training:** Instead of using single precision floating point number (32 bits), we can use half precision floating point number (16 bits). Add a `.to_fp16()` to the end of the learner to create a 16 bit precision.
+
+```py
+learn = Learner.create_unet(data, models, metrics).to_fp16()
+```

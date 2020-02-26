@@ -79,3 +79,7 @@ doc(something): show help + link to docs
 import sys
 !{sys.executable} -m pip install numpy
 ```
+
+### Dataset
+
+Fast.ai has a list of datasets available, usually from academic papers: [Dataset list](https://course.fast.ai/datasets)
