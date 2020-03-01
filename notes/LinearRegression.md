@@ -66,7 +66,7 @@ We have specified a **model** (linear regression), an **evaluation criteria** or
 
 We want to minimize the loss. **Gradient descent** is an algorithm that minimizes functions: it starts with a set of initial values and iteratively moves to a set that minimizes the error.
 
-![Steps of a gradient descent strategy](./img/learning_rate_plot.png)
+![Steps of a gradient descent strategy](./img/shared/learning_rate_plot.png)
 
 ```py
 # Create a parameter object using a random initial value

@@ -46,7 +46,13 @@ for c in classes:
     verify_images(path/c, delete=True, max_size=500)
 ```
 
-5. View data [optional]
+5. Create a DataBunch object.
+
+> [Transform function](https://docs.fast.ai/vision.transform.html#Data-augmentation-details): by default will horizontally flip randomly the images, because it doesn't matter if a cat or a dog are facing the left or right side. We can pass a param `flip_vert` if it also doesn't matter if the image is "upside down".  
+
+> *"[Data augmentation](https://docs.fast.ai/vision.transform.html#Data-augmentation) is perhaps the most important regularization technique when training a model for Computer Vision: instead of feeding the model with the same pictures every time, we do small random transformations (a bit of rotation, zoom, translation, etc...) that don't change what's inside the image (to the human eye) but do change its pixel values."* 
+
+> [get_transforms (FastAI)](https://docs.fast.ai/vision.transform.html#get_transforms) returns a tuple of two lists of transforms: one for the training set and one for the validation set **(we don't want to modify the pictures in the validation set, so the second list of transforms is limited to resizing the pictures)**
 
 ```py
 # Will seed the random number used to create a random validation set below, 
@@ -60,14 +66,19 @@ data = ImageDataBunch.from_folder(path, train=".", valid_pct=0.2,
 # np.random.seed(42)
 # data = ImageDataBunch.from_csv(path, folder=".", valid_pct=0.2, csv_labels='cleaned.csv',
 #         ds_tfms=get_transforms(), size=224, num_workers=4).normalize(imagenet_stats)
+```
 
+6. View data [optional]
+
+```py
+# data.c = len(data.classes)
 print(data.classes)
 # data.show_batch(rows=3, figsize=(7,8))
 print(data.classes, data.c, len(data.train_ds), len(data.valid_ds))
 # (['black', 'grizzly', 'teddys'], 3, 448, 111)
 ```
 
-6. Train the model
+7. Train the model
 
 ```py
 learn = cnn_learner(data, models.resnet34, metrics=error_rate)
@@ -82,7 +93,7 @@ learn.fit_one_cycle(2, max_lr=slice(3e-5,3e-4))
 learn.save('stage-2')
 ```
 
-7. Interpret the results
+8. Interpret the results
 
 ```py
 learn.load('stage-2')
@@ -90,7 +101,7 @@ interp = ClassificationInterpretation.from_learner(learn)
 interp.plot_confusion_matrix()
 ```
 
-8. Clean up dataset if the wrong results are most likely because of bad selected images
+9. Clean up dataset if the wrong results are most likely because of bad selected images
 
 > To run this code, we need to be in GUI environment (jupyter-notebook)
 ```py
@@ -130,7 +141,7 @@ ds, idxs = DatasetFormatter().from_similars(learn_cln)
 # losing all the results from cleaning the data from toplosses.
 ```
  
-9. Put the model in production
+10. Put the model in production
   
 ```py
 # Export the content of the learner object to a "export.pkl" file
@@ -147,6 +158,16 @@ The machine will use the GPU by default or the CPU if no GPU is available. To fo
 ```py
 defaults.device = torch.device('cpu')
 ```
+
+## Kagle Dataset
+
+1. Install Kaggle API module.
+
+```py
+! {sys.executable} -m pip install kaggle --upgrade
+```
+
+2. Create an API key in the Kaggle platform and put the generated JSON file in `~/.kaggle/kaggle.json`
 
 ## In production
 

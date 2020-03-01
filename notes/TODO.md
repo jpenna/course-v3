@@ -22,3 +22,14 @@
 - [ ] How (and why) to create a good validation set https://www.fast.ai/2017/11/13/validation-sets/
 - [ ] Class imbalance problem in convolutional neural networks https://arxiv.org/abs/1710.05381
 - [ ] Series of 8 articles on ML https://medium.com/@ageitgey/machine-learning-is-fun-part-3-deep-learning-and-convolutional-neural-networks-f40359318721
+
+## Lesson 3
+
+### Articles
+
+- [ ] "Finding Data Block Nirvana (a journey through the fastai data block API)". Read after the module https://blog.usejournal.com/finding-data-block-nirvana-a-journey-through-the-fastai-data-block-api-c38210537fe4
+
+### Courses
+
+- [ ] Introduction to Machine Learning for Coders (Jeremy fastai course) https://course.fast.ai/ml
+- [ ] Machine Learning taught by Andrew Ng (Coursera) https://www.coursera.org/learn/machine-learning
