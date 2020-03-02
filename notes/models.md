@@ -1,6 +1,8 @@
-# Models Ref
+# Models
 
-## Imports
+## Initial
+
+### Imports
 
 ```py
 from fastai.vision import *
@@ -166,7 +168,37 @@ Module to create mini-batches from the dataset. "Combines a dataset and a sample
 [DataBunch](https://docs.fast.ai/basic_data.html#DataBunch) (`FastAI`)  
 Class that binds together a training `DataLoader` and and a validation `DataLoader`. Also applies the transform function to the samples as batches are drawn.
 
-## Learner
+### Data block API
+
+We don't use an `ImageDataBunch`, we use an `ImageList`, which uses the correct loss function to supports multiple classes.
+
+> [Data Block API](https://docs.fast.ai/data_block.html) (`FastAI`)  
+> The data block API lets you customize the creation of a `DataBunch` by isolating the underlying parts of that process in separate blocks. It basically lets you parametrize everything calling methods of the `DataBunch` class.
+
+#### Multi-label models (Case: Stellite images)
+
+Planet satellite images from Kaggle: [lesson3-planet](../nbs/dl1/lesson3-planet.ipynb)
+
+If each image can have more than 1 label, we have to do a few things differently.
+
+```py
+# Will flip vertically and won't warp, because there is no perspective change in satellite images
+tfms = get_transforms(flip_vert=True, max_lighting=0.1, max_zoom=1.05, max_warp=0.)
+np.random.seed(42)
+src = (ImageList
+        .from_csv(path, 'train_v2.csv', folder='train-jpg', suffix='.jpg')
+        .split_by_rand_pct(0.2)
+        .label_from_df(label_delim=' ')) # labels are separated with spaces in the CSV
+data = (src
+        .transform(tfms, size=128)
+        .databunch() # Will create the DataBunch and DataLoaders in one go  
+        .normalize(imagenet_stats))
+
+# This will show the images separated by ;
+data.show_batch(rows=3, figsize=(12,9))
+```
+
+### Learner
 
 Everything to create a model.
 Asks for:
@@ -197,13 +229,40 @@ Use the method `fit_one_cycle` to train the model.
 
 > `fit_one_cycle` is better than `fit`, for it runs faster and was a method developed later.
 
-### Layers
+#### Layers
 
 Each layer has a semantic complexity. The first layer may be horizontal and vertical lines, the second shapes, the third body shapes and so on... For this reason, it may not be worth training the whole model from scratch, but just using the dataset we have to train new layers to recognize what we are looking for in our use case.
 
 Each layer adds a little more detail to identify categories of images.
 
-### Metrics
+##### Adding another layer to the trained model
+
+Considering the same case above from the satellite images, we have resized our images to 128x128px, but the original images are 256x256px. If we use these images next, we can use the model we already have and add another layer with "different images" (for the model it will be considered a completely new set).
+
+```py
+data = (src.transform(tfms, size=256)
+        .databunch().normalize(imagenet_stats))
+
+learn.data = data # Replace the dataset
+data.train_ds[0][0].shape # Show the size of the images
+# torch.Size([3, 256, 256])
+
+learn.freeze() # To train only the last layer
+
+learn.lr_find()
+learn.recorder.plot()
+```
+
+![With 256 images layer](./img/Models/add256.png)
+
+```py
+lr=1e-2/2
+learn.fit_one_cycle(5, slice(lr))
+```
+
+![With 256 images layer](./img/Models/add256_acc.png)
+
+#### Metrics
 
 Train loss: Average distance between the real values (event) and the predicted line (plot)
 
@@ -211,43 +270,7 @@ Valid loss:
 
 Error rate: % of wrong classification
 
-## Segmentation
-
-CAMVID notebook: [lesson3-camvid](../nbs/dl1/lesson3-camvid.ipynb)
-
-For segmentation we don't use a Neural Network, we use a U-Net (Convolutional Neural Network crated for biomedical image segmentation, but turned out to be useful for other areas as well).
-
-## Multi-label models (Case: Stellite images)
-
-Planet satellite images from Kaggle: [lesson3-planet](../nbs/dl1/lesson3-planet.ipynb)
-
-If each image can have more than 1 label, we have to do a few things differently.
-
-### DataBunch (Data block API)
-
-We don't use an `ImageDataBunch`, we use an `ImageList`, which uses the correct loss function to supports multiple classes.
-
-> [Data Block API](https://docs.fast.ai/data_block.html) (`FastAI`)  
-> The data block API lets you customize the creation of a `DataBunch` by isolating the underlying parts of that process in separate blocks. It basically lets you parametrize everything calling methods of the `DataBunch` class.
-
-```py
-# Will flip vertically and won't warp, because there is no perspective change in satellite images
-tfms = get_transforms(flip_vert=True, max_lighting=0.1, max_zoom=1.05, max_warp=0.)
-np.random.seed(42)
-src = (ImageList
-        .from_csv(path, 'train_v2.csv', folder='train-jpg', suffix='.jpg')
-        .split_by_rand_pct(0.2)
-        .label_from_df(label_delim=' ')) # labels are separated with spaces in the CSV
-data = (src
-        .transform(tfms, size=128)
-        .databunch() # Will create the DataBunch and DataLoaders in one go  
-        .normalize(imagenet_stats))
-
-# This will show the images separated by ;
-data.show_batch(rows=3, figsize=(12,9))
-```
-
-### Learner
+#### Multi-label model (Case: Stellite images)
 
 We use the same learner as before, but now with a different `metric` param to compare the correctness of the prediction. We now use `accuracy_threshold`, instead of the `accuracy` used previously.
 
@@ -307,32 +330,30 @@ learn.save('stage-2-rn50')
 
 ![Loss 2](./img/Models/loss_2.png)
 
-### Adding another layer to the trained model
+#### Regression model (Case: Head position images)
 
-Considering the same case above from the satellite images, we have resized our images to 128x128px, but the original images are 256x256px. If we use these images next, we can use the model we already have and add another layer with "different images" (for the model it will be considered a completely new set).
+Red dot in the center of a head: [lesson3-head-pose](../nbs/dl1/lesson3-head-pose.ipynb)
 
-```py
-data = (src.transform(tfms, size=256)
-        .databunch().normalize(imagenet_stats))
-
-learn.data = data # Replace the dataset
-data.train_ds[0][0].shape # Show the size of the images
-# torch.Size([3, 256, 256])
-
-learn.freeze() # To train only the last layer
-
-learn.lr_find()
-learn.recorder.plot()
-```
-
-![With 256 images layer](./img/Models/add256.png)
+We use a `PointsItemList` databunch and the loss function is the mean squared error.
 
 ```py
-lr=1e-2/2
-learn.fit_one_cycle(5, slice(lr))
+data = (PointsItemList.from_folder(path)
+        .split_by_valid_func(lambda o: o.parent.name=='13') # Selecting a person (folder)
+        .label_from_func(get_ctr) # Provided from data set
+        .transform(get_transforms(), tfm_y=True, size=(120,160))
+        .databunch().normalize(imagenet_stats)
+       )
 ```
 
-![With 256 images layer](./img/Models/add256_acc.png)
+#### NLP model (Case: IMDB)
+
+IMDB movie reviews: [lesson3-imdb](../nbs/dl1/lesson3-imdb.ipynb)
+
+## Segmentation
+
+CAMVID notebook: [lesson3-camvid](../nbs/dl1/lesson3-camvid.ipynb)
+
+For segmentation we don't use a Neural Network, we use a U-Net (Convolutional Neural Network crated for biomedical image segmentation, but turned out to be useful for other areas as well).
 
 ## Error handling
 

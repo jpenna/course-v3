@@ -28,8 +28,13 @@
 ### Articles
 
 - [ ] "Finding Data Block Nirvana (a journey through the fastai data block API)". Read after the module https://blog.usejournal.com/finding-data-block-nirvana-a-journey-through-the-fastai-data-block-api-c38210537fe4
+- [ ] "Activation Functions: neural networks" https://medium.com/the-theory-of-everything/understanding-activation-functions-in-neural-networks-9491262884e0
 
 ### Courses
 
 - [ ] Introduction to Machine Learning for Coders (Jeremy fastai course) https://course.fast.ai/ml
 - [ ] Machine Learning taught by Andrew Ng (Coursera) https://www.coursera.org/learn/machine-learning
+
+### Books
+
+- [ ] http://neuralnetworksanddeeplearning.com

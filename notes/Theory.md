@@ -71,3 +71,7 @@ Showing how the learning rate changes the loss: [Video](https://youtu.be/MpZxV6D
 ![Good LR](./img/Theory/good_lr.png)
 ![Low LR](./img/Theory/low_lr.png)
 ![High LR](./img/Theory/high_lr.png)
+
+## Metrics (activation functions)
+
+![Activation functions](./img/Theory/activation_functions.png)
