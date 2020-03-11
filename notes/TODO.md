@@ -29,6 +29,7 @@
 
 - [ ] "Finding Data Block Nirvana (a journey through the fastai data block API)". Read after the module https://blog.usejournal.com/finding-data-block-nirvana-a-journey-through-the-fastai-data-block-api-c38210537fe4
 - [ ] "Activation Functions: neural networks" https://medium.com/the-theory-of-everything/understanding-activation-functions-in-neural-networks-9491262884e0
+- [ ] F1 Score (used in the satellite competition on Kaggle) https://en.wikipedia.org/wiki/F1_score
 
 ### Courses
 

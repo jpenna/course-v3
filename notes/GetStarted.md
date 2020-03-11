@@ -9,6 +9,28 @@ All the docs can be cloned and ran locally from https://github.com/fastai/fastai
 
 > Another library that simplify deep learning is Keras.
 
+## Deploy to GCP
+
+```sh
+export IMAGE_FAMILY="pytorch-latest-gpu" # or "pytorch-latest-cpu" for non-GPU instances
+export ZONE="us-west1-b"
+export INSTANCE_NAME="fastai"
+export INSTANCE_TYPE="n1-highmem-8" # budget: "n1-highmem-4"
+
+# budget: 'type=nvidia-tesla-k80,count=1'
+gcloud compute instances create $INSTANCE_NAME \
+        --zone=$ZONE \
+        --image-family=$IMAGE_FAMILY \
+        --image-project=deeplearning-platform-release \
+        --maintenance-policy=TERMINATE \
+        --accelerator="type=nvidia-tesla-p100,count=1" \
+        --machine-type=$INSTANCE_TYPE \
+        --boot-disk-size=200GB \
+        --metadata="install-nvidia-driver=True"
+```
+
+Reference: https://course.fast.ai/start_gcp.html
+
 ## Running
 
 ### Access GCP
@@ -25,9 +47,7 @@ gcloud compute instances start fastai-full
 Run the following command to connect to the server and bind local port 8080.
 
 ```sh
-gcloud compute ssh fastai --zone=us-west2-b -- -L 8080:localhost:8080
-
-gcloud beta compute ssh --zone "northamerica-northeast1-c" "fastai-full" --project "fastai-256902" -- -L 8080:localhost:8080
+gcloud compute ssh jupyter@fastai --zone=us-west1-b -- -L 8080:localhost:8080
 ```
 
 Open: http://localhost:8080/tree
